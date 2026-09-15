@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FHIR Prior-Authorization Agent</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Prior-Authorization AI Agent</h1>
+    <p class="subtitle">Agentic AI + RAG over a self-hosted HAPI FHIR server, seeded with Synthea synthetic patients. No real PHI.</p>
+  </header>
+
+  <main>
+    <section class="panel" id="request-panel">
+      <h2>1. Submit a request</h2>
+      <label>
+        Patient
+        <select id="patient-select"></select>
+      </label>
+      <div id="scenario-desc" class="scenario-desc"></div>
+      <label>
+        Requested service
+        <input id="procedure-display" type="text" readonly />
+      </label>
+      <input id="procedure-code" type="hidden" />
+      <input id="diagnosis-code" type="hidden" />
+      <input id="diagnosis-display" type="hidden" />
+      <button id="submit-btn">Submit prior-authorization request</button>
+    </section>
+
+    <section class="panel" id="progress-panel" hidden>
+      <h2>2. Agent progress</h2>
+      <ol id="step-list"></ol>
+    </section>
+
+    <section class="panel" id="decision-panel" hidden>
+      <h2>3. Determination</h2>
+      <div id="decision-badge" class="badge"></div>
+      <p id="rationale-text"></p>
+      <details id="evidence-details">
+        <summary>Cited evidence</summary>
+        <ul id="evidence-list"></ul>
+      </details>
+      <details id="audit-details">
+        <summary>Full audit trail</summary>
+        <ul id="audit-list"></ul>
+      </details>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

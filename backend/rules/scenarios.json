@@ -1,0 +1,38 @@
+[
+  {
+    "patient_id": "3739fcf1-ff34-56de-b292-f036912be316",
+    "name": "Boyd Dario O'Hara",
+    "scenario_label": "Lumbar MRI -- conservative therapy documented (expect APPROVE)",
+    "suggested_procedure_code": "72148",
+    "suggested_procedure_display": "MRI Lumbar Spine without contrast",
+    "suggested_diagnosis_code": "M54.5",
+    "suggested_diagnosis_display": "Low back pain"
+  },
+  {
+    "patient_id": "b8e979c8-c402-8d42-c138-5fc9be3122e3",
+    "name": "Alene Stiedemann",
+    "scenario_label": "Lumbar MRI -- no conservative therapy on file (expect PEND)",
+    "suggested_procedure_code": "72148",
+    "suggested_procedure_display": "MRI Lumbar Spine without contrast",
+    "suggested_diagnosis_code": "M54.5",
+    "suggested_diagnosis_display": "Low back pain"
+  },
+  {
+    "patient_id": "4f172893-a4f8-04fd-c147-0c9c42aeef77",
+    "name": "Erminia Lesia Erdman",
+    "scenario_label": "Knee arthroscopy -- MRI-confirmed meniscal tear (expect APPROVE)",
+    "suggested_procedure_code": "29881",
+    "suggested_procedure_display": "Knee arthroscopy with meniscectomy",
+    "suggested_diagnosis_code": "S83.2",
+    "suggested_diagnosis_display": "Meniscus tear"
+  },
+  {
+    "patient_id": "4b764027-2ac8-e24b-e7a9-c56d07cec076",
+    "name": "Deadra Walker",
+    "scenario_label": "Knee arthroscopy -- no imaging confirmation on file (expect DENY)",
+    "suggested_procedure_code": "29881",
+    "suggested_procedure_display": "Knee arthroscopy with meniscectomy",
+    "suggested_diagnosis_code": "S83.2",
+    "suggested_diagnosis_display": "Meniscus tear"
+  }
+]

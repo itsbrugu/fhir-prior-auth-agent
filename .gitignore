@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.db
+*.sqlite3
+data/raw_synthea/
+node_modules/
+.chroma/
+chroma_data/
+*.log
+.DS_Store

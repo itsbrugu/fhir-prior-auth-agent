@@ -1,0 +1,71 @@
+# Prior-authorization coverage criteria.
+#
+# Modeled in spirit on the Da Vinci CRD (Coverage Requirements Discovery) and
+# PAS (Prior Authorization Support) implementation guides -- NOT a full
+# CDS Hooks / PAS IG implementation. Each rule below is deliberately small
+# and readable so the deterministic decision is fully auditable; the LLM
+# layer explains and contextualizes this result, it does not override it.
+#
+# Criterion evaluation is generic: it searches the patient's fetched FHIR
+# evidence items (Condition/Procedure/Observation/DiagnosticReport/
+# MedicationRequest text) for matches.
+
+rules:
+  - id: PA-MRI-LUMBAR-01
+    procedure_code: "72148"
+    procedure_display: "MRI Lumbar Spine without contrast"
+    description: >
+      Advanced imaging (MRI) for uncomplicated low back pain requires either
+      documented conservative therapy that has not resolved symptoms, or the
+      presence of red-flag neurological findings that justify skipping
+      conservative care.
+    require_any:
+      - label: "6+ weeks of documented conservative therapy (physical therapy)"
+        type: resource_text_contains
+        resource_types: ["Procedure", "Observation"]
+        contains: ["physical therapy", "physiotherapy"]
+        min_matches: 1
+      - label: "Red-flag neurological findings (radiculopathy / cauda equina)"
+        type: resource_text_contains
+        resource_types: ["Condition"]
+        contains: ["radiculopathy", "cauda equina", "sciatica"]
+        min_matches: 1
+    on_satisfied: APPROVE
+    on_not_satisfied: PEND
+    rationale_satisfied: >
+      Conservative management or red-flag findings are documented in the
+      patient's record, satisfying medical-necessity criteria for advanced
+      lumbar imaging.
+    rationale_not_satisfied: >
+      No documented conservative therapy trial or red-flag neurological
+      findings were found in the patient's record. Additional clinical
+      documentation is required before advanced imaging can be authorized.
+
+  - id: PA-KNEE-ARTHRO-01
+    procedure_code: "29881"
+    procedure_display: "Knee arthroscopy with meniscectomy"
+    description: >
+      Knee arthroscopy with meniscectomy requires imaging-confirmed
+      meniscal pathology plus a failed trial of conservative treatment,
+      unless the presentation includes acute locking/instability.
+    require_any:
+      - label: "Imaging-confirmed meniscal tear plus documented conservative treatment"
+        type: resource_text_contains
+        resource_types: ["DiagnosticReport", "Observation"]
+        contains: ["meniscus", "meniscal tear"]
+        min_matches: 1
+      - label: "Acute knee locking or instability documented"
+        type: resource_text_contains
+        resource_types: ["Condition", "Observation"]
+        contains: ["knee locking", "knee instability", "locked knee"]
+        min_matches: 1
+    on_satisfied: APPROVE
+    on_not_satisfied: DENY
+    rationale_satisfied: >
+      Imaging-confirmed meniscal pathology (or acute locking/instability) is
+      documented, satisfying medical-necessity criteria for surgical
+      intervention.
+    rationale_not_satisfied: >
+      The record does not contain imaging-confirmed meniscal pathology or
+      documentation of acute locking/instability. Surgical intervention is
+      not supported by the available clinical evidence.
