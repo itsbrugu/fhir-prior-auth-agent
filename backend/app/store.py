@@ -90,7 +90,13 @@ def append_audit_step(request_id: str, step: str, summary: str, detail: str | No
             "INSERT INTO audit_steps (request_id, step, summary, detail, timestamp) VALUES (?, ?, ?, ?, ?)",
             (request_id, step, summary, detail, now),
         )
-        conn.execute("UPDATE requests SET status = 'RUNNING', updated_at = ? WHERE id = ?", (now, request_id))
+        # Never downgrade a terminal status -- guards against a step being
+        # logged after set_result/set_error already completed the request.
+        conn.execute(
+            "UPDATE requests SET status = 'RUNNING', updated_at = ? "
+            "WHERE id = ? AND status NOT IN ('COMPLETE', 'ERROR')",
+            (now, request_id),
+        )
 
 
 def set_result(request_id: str, decision: str, rationale: str, evidence_citations: list[str],
@@ -122,6 +128,7 @@ def get_request(request_id: str) -> dict | None:
         if not row:
             return None
         request = dict(row)
+        request["request_id"] = request.pop("id")
         steps = conn.execute(
             "SELECT step, summary, detail, timestamp FROM audit_steps WHERE request_id = ? ORDER BY id ASC",
             (request_id,),

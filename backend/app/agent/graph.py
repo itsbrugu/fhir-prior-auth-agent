@@ -157,6 +157,12 @@ async def record_audit_trail(state: AgentState) -> dict:
     rule = state.get("rule")
     result = state.get("rule_result")
 
+    # Log the step BEFORE writing the terminal status -- append_audit_step
+    # marks the request RUNNING, and that write must not be the last one to
+    # land or the request would never surface as COMPLETE/ERROR to the API.
+    summary = f"Final decision recorded: {state.get('decision')}."
+    store.append_audit_step(state["request_id"], "record_audit_trail", summary)
+
     if state.get("error") and result is None:
         store.set_error(state["request_id"], state["error"])
     else:
@@ -169,8 +175,6 @@ async def record_audit_trail(state: AgentState) -> dict:
             rule_id=rule["id"] if rule else None,
         )
 
-    summary = f"Final decision recorded: {state.get('decision')}."
-    store.append_audit_step(state["request_id"], "record_audit_trail", summary)
     return {"audit_log": [{"step": "record_audit_trail", "summary": summary}]}
 
 

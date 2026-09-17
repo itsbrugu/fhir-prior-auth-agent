@@ -64,7 +64,9 @@ class FhirClient:
 
     async def get_resources_for_patient(self, resource_type: str, patient_id: str) -> list[dict]:
         async with httpx.AsyncClient(timeout=15) as client:
-            bundle = await self._get(client, resource_type, params={"patient": patient_id, "_count": 100})
+            # _count high enough to cover a long-lived synthetic patient's full history in
+            # one page -- a real EHR-scale integration would page through results instead.
+            bundle = await self._get(client, resource_type, params={"patient": patient_id, "_count": 500})
         return [entry["resource"] for entry in bundle.get("entry", []) if "resource" in entry]
 
     async def list_patients(self, count: int = 50) -> list[dict]:

@@ -89,6 +89,11 @@ docker compose up -d backend
 
 Open **http://localhost:8000** and submit a request.
 
+> **Note:** HAPI FHIR runs with its default in-memory H2 database in this
+> compose file (fine for a demo, zero setup). Data doesn't survive a
+> container restart -- if `docker compose restart hapi-fhir` (or a Docker
+> Desktop restart) wipes it, just re-run `python scripts/seed_fhir_server.py`.
+
 ## Regenerating the synthetic data yourself
 
 `data/patients/` and `data/reference/` are already committed, so the
