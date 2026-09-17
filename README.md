@@ -36,6 +36,16 @@ rubber stamp:
 | Erminia Erdman | Knee arthroscopy (29881) | **APPROVE** -- MRI-confirmed meniscal tear |
 | Deadra Walker | Knee arthroscopy (29881) | **DENY** -- no imaging confirmation on file |
 
+## Screenshots
+
+| APPROVE (documented conservative therapy) | PEND (missing documentation) |
+|---|---|
+| ![Lumbar MRI approved](docs/screenshots/lumbar-mri-approve.png) | ![Lumbar MRI pended](docs/screenshots/lumbar-mri-pend.png) |
+
+| APPROVE (MRI-confirmed meniscal tear) | DENY (no imaging confirmation) |
+|---|---|
+| ![Knee arthroscopy approved](docs/screenshots/knee-arthroscopy-approve.png) | ![Knee arthroscopy denied](docs/screenshots/knee-arthroscopy-deny.png) |
+
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full system
 diagram and a table mapping each part of this repo to the underlying
 AI-architecture concepts, and [`docs/COMPLIANCE_NOTE.md`](docs/COMPLIANCE_NOTE.md)
@@ -105,6 +115,38 @@ scripts/generate_synthetic_data.sh 150   # runs Synthea via Docker/JRE
 python scripts/curate_patients.py         # selects candidates matching our 2 scenarios
 python scripts/finalize_demo_patients.py  # picks the final 4, augments 2, writes scenarios.json
 ```
+
+## Shareable/scriptable links
+
+The UI supports two optional query parameters, useful for demos or docs:
+
+- `?demo=<patient_id>` -- auto-selects that patient and submits, so you can
+  link directly to one scenario running live.
+- `?view=<request_id>` -- jumps straight to an already-completed request's
+  result without submitting a new one (used to generate the screenshots
+  above).
+
+## Troubleshooting
+
+- **Docker Desktop isn't running.** Start it before `docker compose up`;
+  the engine takes 30-60s to become ready after launch.
+- **HAPI FHIR shows no patients / a fresh `Patient?_count=1` returns
+  `"total": 0`.** Its database is in-memory and doesn't survive a container
+  restart. Re-run `python scripts/seed_fhir_server.py`.
+- **`ANTHROPIC_API_KEY` errors with "credit balance too low."** That's a
+  separate, pay-as-you-go product from any Claude.ai/Claude Code
+  subscription -- add a payment method at
+  [console.anthropic.com/settings/billing](https://console.anthropic.com/settings/billing).
+  This demo's calls are tiny (short prompts, ~400 output tokens), so testing
+  costs pennies.
+- **Backend container won't start / `depends_on` hangs.** There's no
+  healthcheck gating startup order (HAPI's image lacks `wget`/`curl` to run
+  one) -- `backend` starts as soon as `hapi-fhir`'s container starts, not
+  necessarily once it's actually ready. If the very first request fails,
+  wait a few seconds and retry.
+- **First request is slow (~5-10s extra).** Chroma downloads a small local
+  ONNX embedding model (~80MB) on first use and caches it in the
+  `chroma_model_cache` volume; subsequent runs are fast.
 
 ## Running the tests
 

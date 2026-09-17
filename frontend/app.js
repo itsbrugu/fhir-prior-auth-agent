@@ -24,6 +24,32 @@ async function loadPatients() {
     .map((p) => `<option value="${p.patient_id}">${p.name} — ${p.scenario_label}</option>`)
     .join("");
   onPatientChange();
+
+  // Optional ?demo=<patient_id> auto-selects that patient and submits --
+  // handy for sharing a direct link to one scenario (or scripting screenshots).
+  const autoPatientId = new URLSearchParams(location.search).get("demo");
+  if (autoPatientId && patients.some((p) => p.patient_id === autoPatientId)) {
+    patientSelect.value = autoPatientId;
+    onPatientChange();
+    setTimeout(() => submitBtn.click(), 300);
+  }
+
+  // Optional ?view=<request_id> jumps straight to an already-completed
+  // request's result (e.g. for screenshots) without submitting a new one.
+  const viewRequestId = new URLSearchParams(location.search).get("view");
+  if (viewRequestId) {
+    progressPanel.hidden = false;
+    fetch(`/api/prior-auth/${viewRequestId}`)
+      .then((res) => res.json())
+      .then((record) => {
+        if (patients.some((p) => p.patient_id === record.patient_id)) {
+          patientSelect.value = record.patient_id;
+          onPatientChange();
+        }
+        renderSteps(record.audit_steps);
+        if (record.status === "COMPLETE") renderDecision(record);
+      });
+  }
 }
 
 function onPatientChange() {
