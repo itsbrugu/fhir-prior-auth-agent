@@ -104,6 +104,55 @@ Open **http://localhost:8000** and submit a request.
 > container restart -- if `docker compose restart hapi-fhir` (or a Docker
 > Desktop restart) wipes it, just re-run `python scripts/seed_fhir_server.py`.
 
+## Why an Anthropic API key?
+
+The key is used in exactly one place: the `llm_reasoning` step in
+[`backend/app/agent/graph.py`](backend/app/agent/graph.py), where Claude
+writes the provider-facing rationale for a determination. It is **not** used
+to make the decision -- APPROVE / DENY / PEND comes from the deterministic
+rules engine before the LLM is ever called, and Claude is instructed never
+to contradict it (see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)).
+
+Claude was chosen because this project is meant to demonstrate hands-on
+integration with an enterprise LLM API. The model is configurable via
+`CLAUDE_MODEL` in `.env`.
+
+## Using a different model (e.g. Ollama)
+
+The LLM step is a single, self-contained call, so you can swap in any model
+you prefer (a local Ollama model, OpenAI, Gemini, etc.) without touching the
+rest of the pipeline. The shipped code is Anthropic-only; to use another
+provider, edit `llm_reasoning` in `backend/app/agent/graph.py` and replace
+the `anthropic.Anthropic().messages.create(...)` call. The prompt
+(`SYSTEM_PROMPT` and `user_prompt`) and the returned rationale string stay
+the same.
+
+For example, with a local [Ollama](https://ollama.com/) server (`ollama pull
+llama3.1`), the call could become:
+
+```python
+import httpx
+
+resp = httpx.post(
+    "http://host.docker.internal:11434/api/chat",  # Ollama on your host, from inside Docker
+    json={
+        "model": "llama3.1",
+        "stream": False,
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
+    },
+    timeout=120,
+)
+rationale = resp.json()["message"]["content"].strip()
+```
+
+Then no `ANTHROPIC_API_KEY` is needed. Smaller local models may follow the
+"never contradict the policy decision" instruction less reliably than
+Claude, so review their rationales before trusting them. This Ollama snippet
+is a sketch and has not been tested in this repo.
+
 ## Regenerating the synthetic data yourself
 
 `data/patients/` and `data/reference/` are already committed, so the
