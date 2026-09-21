@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 570" width="1000" height="570" role="img" aria-label="Animated workflow of the prior-authorization agent: UI submits a request, FastAPI starts a LangGraph agent that fetches the FHIR record, checks coverage rules, retrieves evidence via RAG, asks Claude for a rationale, records an audit trail, and returns a decision to the UI.">
+  <style>
+    text { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .bg { fill: #0f172a; }
+    .box { fill: #1e293b; stroke: #334155; stroke-width: 2; }
+    .chip { fill: #111c2f; stroke: #334155; stroke-width: 1.5; stroke-dasharray: 4 3; }
+    .agent { fill: #0b1324; stroke: #38bdf8; stroke-width: 1.5; stroke-dasharray: 6 4; }
+    .title { fill: #e2e8f0; font-size: 14px; font-weight: 600; }
+    .sub { fill: #94a3b8; font-size: 11.5px; }
+    .label { fill: #7dd3fc; font-size: 12px; }
+    .route { fill: none; stroke: #334155; stroke-width: 3; stroke-linejoin: round; }
+    .poll { fill: none; stroke: #64748b; stroke-width: 2; stroke-dasharray: 8 6; animation: flow 1.2s linear infinite; }
+    .link { stroke: #475569; stroke-width: 1.5; stroke-dasharray: 3 3; }
+    .tag-decides { fill: #14532d; stroke: #22c55e; stroke-width: 1; }
+    .tag-explains { fill: #4c1d95; stroke: #a78bfa; stroke-width: 1; }
+    .tag-text { font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+    .caption { fill: #e2e8f0; font-size: 15px; font-weight: 600; opacity: 0; animation: cap 16s infinite; animation-delay: var(--d); }
+    .hl { animation: glow 16s infinite; animation-delay: var(--d); }
+    @keyframes glow {
+      0%   { fill: #0c4a6e; stroke: #38bdf8; }
+      7%   { fill: #0c4a6e; stroke: #38bdf8; }
+      12%  { fill: #1e293b; stroke: #334155; }
+      100% { fill: #1e293b; stroke: #334155; }
+    }
+    @keyframes cap {
+      0%   { opacity: 0; }
+      2%   { opacity: 1; }
+      9%   { opacity: 1; }
+      11%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes flow { to { stroke-dashoffset: -28; } }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+    </marker>
+    <filter id="glowf" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <path id="route" d="M125,70 L385,70 L385,125 L125,125 L125,200 L125,235 L945,235 L945,480 L620,480"/>
+  </defs>
+
+  <rect class="bg" width="1000" height="570" rx="12"/>
+
+  <!-- Static route (the path the request travels) -->
+  <use href="#route" class="route"/>
+
+  <!-- Return path: UI polls for the result -->
+  <path class="poll" d="M380,480 L20,480 L20,70 L40,70" marker-end="url(#arrow)"/>
+  <text class="label" x="200" y="470" text-anchor="middle">UI polls GET /api/prior-auth/{id} every 800 ms</text>
+
+  <!-- Top row -->
+  <rect class="box hl" style="--d:0s" x="40" y="40" width="170" height="60" rx="10"/>
+  <text class="title" x="125" y="66" text-anchor="middle">Web UI</text>
+  <text class="sub" x="125" y="84" text-anchor="middle">pick patient + procedure</text>
+
+  <text class="label" x="255" y="62" text-anchor="middle">POST /submit</text>
+
+  <rect class="box hl" style="--d:1.35s" x="300" y="40" width="170" height="60" rx="10"/>
+  <text class="title" x="385" y="66" text-anchor="middle">FastAPI backend</text>
+  <text class="sub" x="385" y="84" text-anchor="middle">202 + background task</text>
+
+  <!-- LangGraph agent container -->
+  <rect class="agent" x="30" y="150" width="940" height="270" rx="14"/>
+  <text class="label" x="50" y="176">LangGraph agent · typed state · audit log written at every step</text>
+
+  <!-- Agent nodes -->
+  <rect class="box hl" style="--d:4.2s" x="50" y="200" width="150" height="70" rx="10"/>
+  <text class="title" x="125" y="228" text-anchor="middle">fetch_patient</text>
+  <text class="title" x="125" y="246" text-anchor="middle">_context</text>
+  <text class="sub" x="125" y="262" text-anchor="middle">FHIR REST reads</text>
+
+  <rect class="box hl" style="--d:5.5s" x="240" y="200" width="150" height="70" rx="10"/>
+  <text class="title" x="315" y="228" text-anchor="middle">check_coverage</text>
+  <text class="title" x="315" y="246" text-anchor="middle">_rules</text>
+  <text class="sub" x="315" y="262" text-anchor="middle">deterministic policy</text>
+
+  <rect class="box hl" style="--d:6.8s" x="430" y="200" width="150" height="70" rx="10"/>
+  <text class="title" x="505" y="228" text-anchor="middle">retrieve_clinical</text>
+  <text class="title" x="505" y="246" text-anchor="middle">_evidence</text>
+  <text class="sub" x="505" y="262" text-anchor="middle">RAG over the record</text>
+
+  <rect class="box hl" style="--d:8.1s" x="620" y="200" width="150" height="70" rx="10"/>
+  <text class="title" x="695" y="228" text-anchor="middle">llm_reasoning</text>
+  <text class="sub" x="695" y="250" text-anchor="middle">writes the rationale</text>
+
+  <rect class="box hl" style="--d:9.35s" x="810" y="200" width="150" height="70" rx="10"/>
+  <text class="title" x="885" y="228" text-anchor="middle">record_audit</text>
+  <text class="title" x="885" y="246" text-anchor="middle">_trail</text>
+  <text class="sub" x="885" y="262" text-anchor="middle">final status saved</text>
+
+  <!-- DECIDES / EXPLAINS tags -->
+  <rect class="tag-decides" x="275" y="184" width="80" height="16" rx="8"/>
+  <text class="tag-text" x="315" y="195.5" text-anchor="middle" fill="#86efac">DECIDES</text>
+  <rect class="tag-explains" x="655" y="184" width="80" height="16" rx="8"/>
+  <text class="tag-text" x="695" y="195.5" text-anchor="middle" fill="#c4b5fd">EXPLAINS</text>
+
+  <!-- External systems -->
+  <line class="link" x1="125" y1="270" x2="125" y2="308"/>
+  <line class="link" x1="315" y1="270" x2="315" y2="308"/>
+  <line class="link" x1="505" y1="270" x2="505" y2="308"/>
+  <line class="link" x1="695" y1="270" x2="695" y2="308"/>
+  <line class="link" x1="885" y1="270" x2="885" y2="308"/>
+
+  <rect class="chip" x="50" y="308" width="150" height="50" rx="8"/>
+  <text class="title" x="125" y="329" text-anchor="middle">HAPI FHIR</text>
+  <text class="sub" x="125" y="346" text-anchor="middle">Synthea patients</text>
+
+  <rect class="chip" x="240" y="308" width="150" height="50" rx="8"/>
+  <text class="title" x="315" y="329" text-anchor="middle">rules YAML</text>
+  <text class="sub" x="315" y="346" text-anchor="middle">Da Vinci-inspired</text>
+
+  <rect class="chip" x="430" y="308" width="150" height="50" rx="8"/>
+  <text class="title" x="505" y="329" text-anchor="middle">Chroma</text>
+  <text class="sub" x="505" y="346" text-anchor="middle">local embeddings</text>
+
+  <rect class="chip" x="620" y="308" width="150" height="50" rx="8"/>
+  <text class="title" x="695" y="329" text-anchor="middle">Claude API</text>
+  <text class="sub" x="695" y="346" text-anchor="middle">or any model you swap in</text>
+
+  <rect class="chip" x="810" y="308" width="150" height="50" rx="8"/>
+  <text class="title" x="885" y="329" text-anchor="middle">SQLite</text>
+  <text class="sub" x="885" y="346" text-anchor="middle">requests + audit steps</text>
+
+  <text class="sub" x="500" y="392" text-anchor="middle">The rules engine picks APPROVE / DENY / PEND before the LLM is called; the LLM never overrides it.</text>
+
+  <!-- Decision -->
+  <rect class="box hl" style="--d:13.6s" x="380" y="450" width="240" height="60" rx="10"/>
+  <text class="title" x="500" y="476" text-anchor="middle">Determination</text>
+  <text class="sub" x="500" y="494" text-anchor="middle">APPROVE · PEND · DENY + cited evidence</text>
+
+  <!-- Moving request packet -->
+  <g filter="url(#glowf)">
+    <circle r="8" fill="#38bdf8">
+      <animateMotion dur="16s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;1" keyTimes="0;0.875;1">
+        <mpath href="#route"/>
+      </animateMotion>
+    </circle>
+  </g>
+
+  <!-- Step captions (one visible at a time) -->
+  <text class="caption" style="--d:-0.2s" x="500" y="550" text-anchor="middle">1 · Provider submits a prior-authorization request</text>
+  <text class="caption" style="--d:1.15s" x="500" y="550" text-anchor="middle">2 · FastAPI accepts it and starts the agent in the background</text>
+  <text class="caption" style="--d:4.0s" x="500" y="550" text-anchor="middle">3 · Fetch the patient's FHIR record from HAPI</text>
+  <text class="caption" style="--d:5.3s" x="500" y="550" text-anchor="middle">4 · Deterministic rules decide APPROVE / DENY / PEND</text>
+  <text class="caption" style="--d:6.6s" x="500" y="550" text-anchor="middle">5 · RAG pulls the most relevant supporting evidence</text>
+  <text class="caption" style="--d:7.9s" x="500" y="550" text-anchor="middle">6 · The LLM explains the decision, citing that evidence</text>
+  <text class="caption" style="--d:9.15s" x="500" y="550" text-anchor="middle">7 · Result and audit trail are saved</text>
+  <text class="caption" style="--d:13.4s" x="500" y="550" text-anchor="middle">8 · The UI shows the determination and audit log</text>
+</svg>

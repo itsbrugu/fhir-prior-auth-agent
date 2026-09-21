@@ -10,6 +10,10 @@ running code rather than slides, the intersection of: LLM agents, RAG,
 HL7/FHIR, and AI governance/explainability -- the core of an AI
 Architect role in healthcare.
 
+## Animated workflow
+
+![Animated workflow of one prior-auth request](workflow.svg)
+
 ## System diagram
 
 ```mermaid

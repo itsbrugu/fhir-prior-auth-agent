@@ -51,6 +51,15 @@ diagram and a table mapping each part of this repo to the underlying
 AI-architecture concepts, and [`docs/COMPLIANCE_NOTE.md`](docs/COMPLIANCE_NOTE.md)
 for exactly where the synthetic data came from and how it was curated.
 
+## Workflow (animated)
+
+![Animated workflow: a request packet travels from the UI through FastAPI and the five LangGraph steps, then back to the UI as a determination](docs/workflow.svg)
+
+The blue dot is one prior-auth request moving through the system; each step
+lights up as it runs. Source: [`docs/workflow.svg`](docs/workflow.svg)
+(plain SVG with CSS/SMIL animation, no JavaScript, so it also animates on
+GitHub).
+
 ## Architecture at a glance
 
 ```
